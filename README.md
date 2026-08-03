@@ -11,6 +11,8 @@ Inspired by the structure of a corporate InfoSec policy, scaled down for individ
 
 See a compiled PDF of the template [here](personal-security-policy-template.pdf).
 
+![Preview](preview.png)
+
 ## What's Inside
 
 The template compiles to a multi-page PDF with the following sections:

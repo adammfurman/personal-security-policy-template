@@ -19,7 +19,7 @@
 #let c-amber   = rgb("#D97706")
 #let c-red     = rgb("#DC2626")
 #let c-purple  = rgb("#7C3AED")
-#let accent = blue
+#let accent = c-blue
 #let subtle = luma(130)
 #let rule-color = luma(180)
 
@@ -107,12 +107,14 @@
 
 // Risk badge
 #let badge(level) = {
-  let (color, label) = if level == "high" {
-    (c-red, "HIGH")
-  } else if level == "medium" {
-    (c-amber, "MEDIUM")
+  let (color, label) = if level == "high" or level == "secret" {
+    (c-red, upper(level))
+  } else if level == "medium" or level == "confidential" {
+    (c-amber, upper(level))
+  } else if level == "low" or level == "public" {
+    (c-teal, upper(level))
   } else {
-    (c-teal, "LOW")
+    (black, upper(level))
   }
   box(
     fill: color,
@@ -169,45 +171,84 @@
 
 = Data Classification
 
+#text(size: 9pt, fill: subtle)[Every category of data you hold, its classification tier, where it is stored, and the controls required to protect it. ]
+#v(6pt)
+
 #grid(
   columns: (1fr, 1fr, 1fr),
   column-gutter: 18pt,
   [
-    #sub("🔴 Critical", color: c-red)
-    #text(size: 8.5pt, fill: subtle)[Loss or exposure causes serious harm. Requires 3-2-1 backup and encryption.]
+    #sub("🔴 Secret", color: c-red)
+    #text(size: 8.5pt, fill: subtle)[Loss or exposure causes serious harm (e.g., password vault master password, private keys, cryptocurrency seed phrases, TOTP codes).]
     #v(5pt)
     #set text(size: 9pt)
-    - Financial records (tax, banking) \
-    - Legal documents (wills, contracts) \
-    - Identity documents (passport, SSN) \
-    - Password vault / private keys \
-    - Irreplaceable personal files \
-    - [Add your own] \
-    - [Add your own]
+    
+    Controls & Safeguards: 
+
+    - Encryption at rest
+    - 3-2-1 backup
+      - 3 copies
+      - 2 media types
+      - 1 off-site storage
+    - Fully air-gapped
+    - Succession plan
   ],
   [
-    #sub("🟡 Sensitive", color: c-amber)
-    #text(size: 8.5pt, fill: subtle)[Exposure is damaging; loss is painful but survivable. Requires two copies.]
+    #sub("🟡 Confidential", color: c-amber)
+    #text(size: 8.5pt, fill: subtle)[Exposure is damaging; loss is painful but survivable (e.g., Financial documents, ID scans, medical records, passwords).]
     #v(5pt)
     #set text(size: 9pt)
-    - Personal photos and videos \
-    - Email archive \
-    - Health and medical records \
-    - Personal correspondence \
-    - [Add your own] \
-    - [Add your own]
+    
+    Controls & Safeguards:
+
+    - Encryption at rest
+    - Multi-Factor Authentication
+    - 2 copies
+    - E2E encryption for cloud storage
+    - Succesion Plan
   ],
   [
-    #sub("🟢 Replaceable", color: c-teal)
-    #text(size: 8.5pt, fill: subtle)[Can be reinstalled or regenerated. Basic single backup is sufficient.]
+    #sub("🟢 Public", color: c-teal)
+    #text(size: 8.5pt, fill: subtle)[Non-sensitive information where exposure and loss do not cause harm (e.g., photos, notes, regular computer files). ]
     #v(5pt)
     #set text(size: 9pt)
-    - Installed applications \
-    - Cached and temporary data \
-    - Downloaded media \
-    - OS configuration \
-    - [Add your own]
+    
+    Controls & Safeguards:
+
+    - Device/user account passcode
+    - 2 copies
+    - E2E encrypted cloud storage
   ],
+)
+
+#v(10pt)
+
+#styled-table(
+  (1fr, 1fr, 2fr, 2fr),
+  (
+    text(size: 8.5pt, weight: "bold", fill: white)[Data Type],
+    align(center)[#text(size: 8.5pt, weight: "bold", fill: white)[Tier]],
+    text(size: 8.5pt, weight: "bold", fill: white)[Storage Location],
+    text(size: 8.5pt, weight: "bold", fill: white)[Control Details],
+  ),
+  [Private keys],                   align(center)[#badge("secret")], [[1. Security key \ 2. Encrypted USB \ 3. Safety deposit box paper backup]], [[All copies > 256-bit encryption \ All copies air-gapped \ Encryption passwords stored in pasword vault]],
+  [Cryptocurrency seed phrases],                         align(center)[#badge("secret")],    [],                                 [],
+  [[Add your own]],                         align(center)[#badge("secret")],    [],                                 [],
+  [Financial records (tax, banking)],       align(center)[#badge("confidential")],    [[Encrypted vault / local drive]], [FDE + offline backup + no cloud sync],
+  [Legal documents (wills, contracts)],     align(center)[#badge("confidential")],    [[Fireproof safe + scanned copy]], [Physical original + encrypted digital copy],
+  [Identity documents (passport, SSN)],     align(center)[#badge("confidential")],    [[Physical safe / vault]],         [Never stored unencrypted digitally],
+  [Password vault],                         align(center)[#badge("confidential")],    [[Password manager]],              [MFA on vault + offline emergency export],
+  [Irreplaceable personal files],           align(center)[#badge("confidential")],    [[NAS + cloud backup]],            [3-2-1 rule: 3 copies, 2 media, 1 offsite],
+  [Personal photos and videos],             align(center)[#badge("confidential")],   [[Cloud photo library + NAS]],     [Encrypted at rest + 2 copies],
+  [Email archive],                          align(center)[#badge("confidential")],   [[Provider + local export]],       [Account MFA + periodic local export],
+  [Health and medical records],             align(center)[#badge("confidential")],   [[Patient portal + encrypted folder]], [Encrypted storage, access restricted],
+  [Personal correspondence],                align(center)[#badge("confidential")],   [[Local device / encrypted folder]], [Device FDE sufficient],
+  [[Add your own]],                         align(center)[#badge("confidential")],   [],                                 [],
+  [Installed applications],                 align(center)[#badge("public")], [Local device],                     [None — reinstall from source],
+  [Cached and temporary data],              align(center)[#badge("public")], [Local device],                     [None],
+  [Downloaded media],                       align(center)[#badge("public")], [Local device / NAS],              [Single backup, best-effort],
+  [OS configuration],                       align(center)[#badge("public")], [[Dotfiles repo / config export]], [Version-controlled config repo],
+  [[Add your own]],                         align(center)[#badge("public")], [],                                 [],
 )
 
 // ─── 3. THREAT MODEL ───────────────────────────────────────────────────────
@@ -309,7 +350,7 @@
 
 = Review & Audit Log
 
-#text(size: 9pt, fill: subtle)[Record every review. A log that isn't maintained is a policy that isn't being practiced.]
+#text(size: 9pt, fill: subtle)[Record every review and any findings, remediations, or changes.]
 #v(6pt)
 
 #styled-table(
@@ -343,7 +384,7 @@
     text(size: 8.5pt, weight: "bold", fill: white)[Integrity Check],
   ),
   [], [Local backup],   [], align(center)[✓], [], align(center)[✓],
-  [], [Cloud backup],   [], align(center)[✕], [], align(center)[✕],
+  [], [Cloud backup],   [], align(center)[—], [], align(center)[—],
   [], [Local backup],   [], align(center)[], [], align(center)[],
   [], [Cloud backup],   [], align(center)[], [], align(center)[],
   [], [Local backup],   [], align(center)[], [], align(center)[],

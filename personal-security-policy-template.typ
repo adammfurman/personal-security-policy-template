@@ -1,7 +1,7 @@
 // Personal Security Policy
 // Update at every annual review. All [BRACKETED] fields are placeholders.
 // Copyright Adam M. Furman - https://adamfurman.me
-// GPL-2.0 License
+// GPLv3 License
 
 
 // ─── DOCUMENT VARIABLES ─────────────────────────────────────────────────────────────────

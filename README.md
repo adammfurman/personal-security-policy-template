@@ -7,6 +7,10 @@ A clean, printable **Typst** template for maintaining a personal information sec
 
 Inspired by the structure of a corporate InfoSec policy, scaled down for individual use.
 
+## Preview
+
+See a compiled PDF of the template [here](personal-security-policy-template.pdf).
+
 ## What's Inside
 
 The template compiles to a multi-page PDF with the following sections:
